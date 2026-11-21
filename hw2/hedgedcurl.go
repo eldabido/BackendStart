@@ -21,8 +21,10 @@ type res struct {
 
 // fetch - функция для запроса.
 func fetch(ctx context.Context, client *http.Client, url string, dir string) (string, error) {
-	// Проверяем, что URL начинается с http://, если нет, добавляем.
-	if !strings.Contains(url, "://") {
+	// Проверяем, что URL начинается с http(s)://, если нет, добавляем.
+	lowerURL := strings.ToLower(url) // копию строки в нижнем регистре проверяем.
+
+	if !strings.HasPrefix(lowerURL, "http://") && !strings.HasPrefix(lowerURL, "https://") {
 		url = "http://" + url
 	}
 
@@ -97,7 +99,7 @@ func run() int {
 	urls := flag.Args()
 	maxTimeout := math.MaxInt64 / int64(time.Second)
 	if timeout <= 0 || int64(timeout) > maxTimeout {
-		fmt.Fprintln(os.Stderr, "Timeout should be between 1 and %d seconds", maxTimeout)
+		fmt.Fprintf(os.Stderr, "Timeout should be between 1 and %d seconds\n", maxTimeout)
 		return 1
 	}
 
